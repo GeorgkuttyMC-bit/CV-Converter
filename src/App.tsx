@@ -39,7 +39,24 @@ export default function App() {
       setData(parsedData);
     } catch (err) {
       console.error(err);
-      setError(err instanceof Error ? err.message : 'Unknown error occurred parsing CV.');
+      let errorMessage = 'Unknown error occurred parsing CV.';
+      if (err instanceof Error) {
+        if (err.message.includes('503') || err.message.includes('UNAVAILABLE') || err.message.includes('high demand')) {
+          errorMessage = 'The AI model is currently experiencing high demand. This is usually temporary. Please try again in a few moments.';
+        } else {
+          try {
+            const parsedError = JSON.parse(err.message.replace(/^.*?{/, '{'));
+            if (parsedError?.error?.message) {
+              errorMessage = parsedError.error.message;
+            } else {
+              errorMessage = err.message;
+            }
+          } catch {
+            errorMessage = err.message;
+          }
+        }
+      }
+      setError(errorMessage);
     } finally {
       setIsProcessing(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
