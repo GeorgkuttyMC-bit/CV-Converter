@@ -33,6 +33,24 @@ export function MinimalistTheme({ data, theme }: MinimalistThemeProps) {
               <span>{data.personal.website}</span>
             </>
           )}
+          {data.personal.linkedin && (
+            <>
+              <span>•</span>
+              <span>{data.personal.linkedin}</span>
+            </>
+          )}
+          {data.personal.github && (
+            <>
+              <span>•</span>
+              <span>{data.personal.github}</span>
+            </>
+          )}
+          {data.personal.portfolio && (
+            <>
+              <span>•</span>
+              <span>{data.personal.portfolio}</span>
+            </>
+          )}
         </div>
       </header>
 

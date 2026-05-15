@@ -1,7 +1,18 @@
 import { GoogleGenAI, Type, Schema } from '@google/genai';
 import { CVData } from '../types';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+let aiClient: GoogleGenAI | null = null;
+
+function getAIClient(): GoogleGenAI {
+  if (!aiClient) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey || apiKey === 'undefined' || apiKey === 'null') {
+      throw new Error("GEMINI_API_KEY is not defined. Please set it in your environment variables.");
+    }
+    aiClient = new GoogleGenAI({ apiKey });
+  }
+  return aiClient;
+}
 
 const cvSchema: Schema = {
   type: Type.OBJECT,
@@ -15,7 +26,10 @@ const cvSchema: Schema = {
         phone: { type: Type.STRING },
         location: { type: Type.STRING },
         summary: { type: Type.STRING, description: "A creative, compelling professional summary (revised for impact)" },
-        website: { type: Type.STRING }
+        website: { type: Type.STRING },
+        linkedin: { type: Type.STRING, description: "LinkedIn Profile URL" },
+        github: { type: Type.STRING, description: "GitHub Profile URL" },
+        portfolio: { type: Type.STRING, description: "Portfolio or Website URL" }
       },
       required: ["name", "role", "email", "summary"]
     },
@@ -61,6 +75,7 @@ const cvSchema: Schema = {
 
 export async function parseCVFile(file: File): Promise<CVData> {
   const base64Data = await fileToBase64(file);
+  const ai = getAIClient();
   
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash',

@@ -32,13 +32,13 @@ export function CVPreview({ data, theme, previewRef }: CVPreviewProps) {
         Scale transform helps to fit it visually inside the browser while maintaining high-res for export.
       */}
       <div 
-        className="relative mx-auto shadow-2xl overflow-hidden"
-        style={{ width: '800px', minHeight: '1131px', backgroundColor: '#ffffff' }} 
+        ref={previewRef}
+        className="relative mx-auto shadow-2xl overflow-hidden cv-preview-container"
+        style={{ width: '800px', minHeight: '1131px', backgroundColor: '#ffffff', color: '#111827' }} 
+        id="cv-preview-content"
       >
-        <div ref={previewRef} className="w-full h-full origin-top-left" id="cv-preview-content" style={{ backgroundColor: '#ffffff', color: '#111827' }}>
           {theme.id === 'minimalist' && <MinimalistTheme data={data} theme={theme} />}
           {theme.id === 'creative' && <CreativeTheme data={data} theme={theme} />}
-        </div>
       </div>
     </div>
   );

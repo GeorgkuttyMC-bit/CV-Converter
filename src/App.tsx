@@ -58,22 +58,25 @@ export default function App() {
       // Brief pause to ensure all fonts/UI render properly
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      // Temporarily enforce styles for a consistent high-quality capture
-      const originalStyle = previewRef.current.style.cssText;
-      previewRef.current.style.width = '800px';
-      previewRef.current.style.height = '1131px';
-      previewRef.current.style.transform = 'none';
+      const originalScrollY = window.scrollY;
+      window.scrollTo(0, 0);
 
       const canvas = await html2canvas(previewRef.current, {
-        scale: 4, // Bumped to 4x for ultra-sharp text and images
+        scale: 3, // 3x for ultra-sharp text and images
         useCORS: true,
         backgroundColor: '#ffffff',
         logging: false,
         windowWidth: 800,
+        onclone: (doc) => {
+          const el = doc.getElementById('cv-preview-content');
+          if (el) {
+            el.style.transform = 'none';
+            el.style.boxShadow = 'none';
+          }
+        }
       });
 
-      // Restore
-      previewRef.current.style.cssText = originalStyle;
+      window.scrollTo(0, originalScrollY);
 
       // Switch to PNG to avoid JPEG compression artifacts on text
       const imgData = canvas.toDataURL('image/png');
@@ -122,28 +125,7 @@ export default function App() {
         </div>
         
         <div className="flex items-center gap-3">
-          {data && (
-            <>
-              <button
-                onClick={() => handlePrint()}
-                disabled={isProcessing}
-                className="px-4 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-lg flex items-center gap-2 hover:bg-gray-50 focus:outline-none transition-colors shadow-sm disabled:opacity-50"
-                title="Print or Save as Vector PDF (Best Quality)"
-              >
-                <Printer className="w-4 h-4" />
-                Print / Vector PDF
-              </button>
-              <button
-                onClick={handleDownloadPDF}
-                disabled={isProcessing}
-                className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg flex items-center gap-2 hover:bg-gray-800 disabled:opacity-50 transition-colors shadow-sm"
-                title="Download as Image PDF"
-              >
-                {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                Download (Image)
-              </button>
-            </>
-          )}
+          {/* Header buttons removed in favor of the bottom export panel */}
         </div>
       </header>
 
@@ -214,12 +196,45 @@ export default function App() {
         </aside>
 
         {/* Right Content - Live Preview */}
-        <main className="flex-1 overflow-auto bg-gray-100/50 p-8 flex justify-center custom-scrollbar relative">
+        <main className="flex-1 overflow-auto bg-gray-100/50 p-8 pt-8 pb-32 flex justify-center custom-scrollbar relative flex-col items-center">
           <div className="absolute inset-0 pattern-dots opactiy-50 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
           
-          <div className="relative transform-origin-top transition-transform duration-300 ease-out z-10">
+          <div className="relative transform-origin-top transition-transform duration-300 ease-out z-10 w-full max-w-[800px] flex justify-center">
             <CVPreview data={data} theme={theme} previewRef={previewRef} />
           </div>
+
+          {/* Export Panel at Bottom */}
+          {data && (
+            <div className="fixed bottom-8 left-[380px] right-0 flex justify-center z-20 pointer-events-none">
+              <div className="bg-white/90 backdrop-blur-md shadow-2xl border border-gray-200/60 rounded-2xl p-5 flex items-center gap-6 pointer-events-auto transform transition-all duration-500 translate-y-0 opacity-100">
+                <div>
+                  <h3 className="text-gray-900 font-bold text-lg leading-tight">Ready to Export?</h3>
+                  <p className="text-gray-500 text-sm">Download your tailored resume.</p>
+                </div>
+                
+                <div className="w-[1px] h-10 bg-gray-200"></div>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => handlePrint()}
+                    disabled={isProcessing}
+                    className="px-6 py-3 bg-white border-2 border-indigo-100 text-indigo-700 text-sm font-bold rounded-xl flex items-center gap-2 hover:bg-indigo-50 hover:border-indigo-200 focus:outline-none transition-all shadow-sm disabled:opacity-50"
+                  >
+                    <Printer className="w-5 h-5" />
+                    High Quality PDF (Print)
+                  </button>
+                  <button
+                    onClick={handleDownloadPDF}
+                    disabled={isProcessing}
+                    className="px-6 py-3 bg-indigo-600 text-white text-sm font-bold rounded-xl flex items-center gap-2 hover:bg-indigo-700 disabled:opacity-50 transition-all shadow-md hover:shadow-lg"
+                  >
+                    {isProcessing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
+                    Standard Output
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </main>
       </div>
 

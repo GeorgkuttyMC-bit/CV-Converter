@@ -7,6 +7,9 @@ export interface CVData {
     location: string;
     summary: string;
     website?: string;
+    linkedin?: string;
+    github?: string;
+    portfolio?: string;
   };
   experience: Array<{
     id: string;

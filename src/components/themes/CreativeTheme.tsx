@@ -48,6 +48,21 @@ export function CreativeTheme({ data, theme }: CreativeThemeProps) {
                 <span className="break-all">{data.personal.website}</span>
               </div>
             )}
+            {data.personal.linkedin && (
+              <div className="flex items-center gap-3">
+                <span className="break-all">{data.personal.linkedin}</span>
+              </div>
+            )}
+            {data.personal.github && (
+              <div className="flex items-center gap-3">
+                <span className="break-all">{data.personal.github}</span>
+              </div>
+            )}
+            {data.personal.portfolio && (
+              <div className="flex items-center gap-3">
+                <span className="break-all">{data.personal.portfolio}</span>
+              </div>
+            )}
           </div>
         </div>
 
