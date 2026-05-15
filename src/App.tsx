@@ -107,15 +107,20 @@ export default function App() {
       });
 
       const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-      // Add image as PNG
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
       
-      // If content exceeds 1 page, add new page
-      if (pdfHeight > pdf.internal.pageSize.getHeight()) {
-         // Advanced multi-page logic could go here, but scaling to 1 page or clipping usually works best for CVs 
-         // without manual content splitting.
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight, undefined, 'FAST');
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight, undefined, 'FAST');
+        heightLeft -= pageHeight;
       }
 
       pdf.save(`${data?.personal?.name?.replace(/\s+/g, '_') || 'creative'}_CV.pdf`);
